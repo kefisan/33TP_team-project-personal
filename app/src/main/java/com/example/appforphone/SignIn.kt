@@ -41,13 +41,18 @@ class SignIn : AppCompatActivity() {
 
         loginButton.setOnClickListener{
             Log.d("Credentials","Login button pressed")
+            val password="1234Bt_-_"
+            val email="test@te.st"
+            val inputPassword = passwordEditText.text.toString()
+            val inputEmail = emailEditText.text.toString()
 
-            if(!credentialsManager.isPasswordValid(passwordEditText.text.toString()) && !credentialsManager.isEmailValid(emailEditText.text.toString())) {
+
+            if(!credentialsManager.isPasswordValid(inputPassword) && !credentialsManager.isEmailValid(inputEmail) && inputPassword != password && inputEmail != email) {
                 loginButton.setError("Wrong password or email!")
                 loginErrorPopup.show()
             }
             else{
-
+                startActivity(Intent(this@SignIn,MainActivity::class.java))
             }
         }
     }
