@@ -3,7 +3,6 @@ package com.example.appforphone
 import java.util.regex.Pattern
 
 class CredentialsManager {
-    //Pattern for the email(stolen from Google)
     val EMAIL_ADDRESS_PATTERN: Pattern = Pattern.compile(
         "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
                 "\\@" +
