@@ -3,11 +3,16 @@ package com.example.appforphone
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 
 class SignIn : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,5 +32,28 @@ class SignIn : AppCompatActivity() {
             val goToRegisterIntent = Intent(this, RegisterNow::class.java)
             startActivity(goToRegisterIntent)
         }
+
+        val loginButton = findViewById<Button>(R.id.login_button)
+        val passwordEditText = findViewById<TextInputEditText>(R.id.passwordText)
+        val emailEditText = findViewById<TextInputEditText>(R.id.usernameText)
+        val credentialsManager = CredentialsManager()
+        val loginErrorPopup = Snackbar.make(loginButton,"Wrong email or password",10000)
+
+        loginButton.setOnClickListener{
+            Log.d("Credentials","Login button pressed")
+            val password="1234Bt_-_"
+            val email="test@te.st"
+            val inputPassword = passwordEditText.text.toString()
+            val inputEmail = emailEditText.text.toString()
+
+
+            if(credentialsManager.isPasswordValid(inputPassword) && credentialsManager.isEmailValid(inputEmail) && inputPassword == password && inputEmail == email) {
+                startActivity(Intent(this@SignIn,MainActivity::class.java))
+                }
+                else{
+                    loginButton.setError("Wrong password or email")
+                    loginErrorPopup.show();
+                }
+            }
+        }
     }
-}
