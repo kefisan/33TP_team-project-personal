@@ -14,12 +14,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.textfield.TextInputLayout
 
-//this code causes error, but the main idea is here, so I want to clarify it on the lesson
 
 class RegisterNow : AppCompatActivity() {
 
     private lateinit var mailEditText: EditText
+    private lateinit var passwordEditText: EditText
     private lateinit var credentialsManager: CredentialsManager
 
 
@@ -28,7 +29,8 @@ class RegisterNow : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_register_now)
 
-        mailEditText = findViewById(R.id.mail)
+        passwordEditText = findViewById<TextInputLayout>(R.id.password).editText!!
+        mailEditText = findViewById<TextInputLayout>(R.id.mail).editText!!
         credentialsManager = CredentialsManager()
 
         mailEditText.addTextChangedListener(object : TextWatcher {
@@ -38,32 +40,41 @@ class RegisterNow : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
 
+            // some fix here
+
             override fun afterTextChanged(s: Editable?) {
+                val password = s.toString()
                 val email = s.toString()
-                val isValid = credentialsManager.isEmailValid(email)
+                val isValid = credentialsManager.isEmailValid(email) && credentialsManager.isPasswordValid(password)
                 if (isValid) {
                     mailEditText.error = null
+                    passwordEditText.error = null
                 } else {
                     mailEditText.error = getString(R.string.error_invalid_email)
+                    passwordEditText.error = getString(R.string.error_invalid_password)
                 }
             }
         })
 
-        //this can be changed and separated after fixing the main issue
+//        val registerScreenLabel = findViewById<TextView>(R.id.register_now)
+//        registerScreenLabel.setOnClickListener {
+//            Log.d("Onboarding", "Sign in pressed")
+//
+//            val email = mailEditText.text.toString().trim()
+//            val isValidEmail = credentialsManager.isEmailValid(email)
+//            if (isValidEmail) {
+//                val goToRegisterIntent = Intent(this, SignIn::class.java)
+//                startActivity(goToRegisterIntent)
+//            } else {
+//                Toast.makeText(this, getString(R.string.error_invalid_email), Toast.LENGTH_SHORT).show()
+//            }
 
-        val registerScreenLabel = findViewById<TextView>(R.id.register_now)
-        registerScreenLabel.setOnClickListener {
-            Log.d("Onboarding", "Sign in pressed")
+        val signInLabel = findViewById<TextView>(R.id.register_now)
+        signInLabel.setOnClickListener {
+            Log.d("Onboarding", "Sign In pressed")
 
-            val email = mailEditText.text.toString().trim()
-            val isValidEmail = credentialsManager.isEmailValid(email)
-            if (isValidEmail) {
-                val goToRegisterIntent = Intent(this, SignIn::class.java)
-                startActivity(goToRegisterIntent)
-            } else {
-                Toast.makeText(this, getString(R.string.error_invalid_email), Toast.LENGTH_SHORT).show()
-            }
-
+            val goToRegisterIntent = Intent(this, RegisterNow::class.java)
+            startActivity(goToRegisterIntent)
 
         }
 

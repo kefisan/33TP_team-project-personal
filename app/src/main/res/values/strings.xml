@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">app for phone</string>
     <string name="error_invalid_email">Invalid email address</string>
+    <string name="error_invalid_password">Invalid password</string>
 </resources>
