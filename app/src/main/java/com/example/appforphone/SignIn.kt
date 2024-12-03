@@ -36,19 +36,33 @@ class SignIn : AppCompatActivity() {
         val loginButton = findViewById<Button>(R.id.login_button)
         val passwordEditText = findViewById<TextInputEditText>(R.id.passwordText)
         val emailEditText = findViewById<TextInputEditText>(R.id.usernameText)
+        val emailLayout = findViewById<TextInputLayout>(R.id.username)
+        val passwordLayout = findViewById<TextInputLayout>(R.id.passwordSignIn)
         val credentialsManager = CredentialsManager()
         val loginErrorPopup = Snackbar.make(loginButton,"Wrong email or password",10000)
 
         loginButton.setOnClickListener{
             Log.d("Credentials","Login button pressed")
-            val password="1234Bt_-_"
-            val email="test@te.st"
             val inputPassword = passwordEditText.text.toString()
             val inputEmail = emailEditText.text.toString()
 
+            if(!credentialsManager.isPasswordValid(inputPassword)){
+                passwordLayout.error = "Invalid Password"
+                return@setOnClickListener
+            }
+            else{
+                passwordLayout.error = null
+            }
 
-            if(!credentialsManager.isPasswordValid(inputPassword) && !credentialsManager.isEmailValid(inputEmail) && inputPassword != password && inputEmail != email) {
-                loginButton.setError("Wrong password or email!")
+            if(!credentialsManager.isEmailValid(inputEmail)){
+                emailLayout.error = "Invalid Email"
+                return@setOnClickListener
+            }
+            else{
+                emailLayout.error = null
+            }
+
+            if(!credentialsManager.doesPasswordMatchEmail(inputEmail,inputPassword)) {
                 loginErrorPopup.show()
             }
             else{
