@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.widget.Button
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -14,6 +15,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputLayout
 
 
@@ -82,6 +86,43 @@ class SignIn : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        val loginButton = findViewById<Button>(R.id.login_button)
+        val passwordEditText = findViewById<TextInputEditText>(R.id.passwordText)
+        val emailEditText = findViewById<TextInputEditText>(R.id.usernameText)
+        val emailLayout = findViewById<TextInputLayout>(R.id.username)
+        val passwordLayout = findViewById<TextInputLayout>(R.id.passwordSignIn)
+        val credentialsManager = CredentialsManager()
+        val loginErrorPopup = Snackbar.make(loginButton,"Wrong email or password",10000)
+
+        loginButton.setOnClickListener{
+            Log.d("Credentials","Login button pressed")
+            val inputPassword = passwordEditText.text.toString()
+            val inputEmail = emailEditText.text.toString()
+
+            if(!credentialsManager.isPasswordValid(inputPassword)){
+                passwordLayout.error = "Invalid Password"
+                return@setOnClickListener
+            }
+            else{
+                passwordLayout.error = null
+            }
+
+            if(!credentialsManager.isEmailValid(inputEmail)){
+                emailLayout.error = "Invalid Email"
+                return@setOnClickListener
+            }
+            else{
+                emailLayout.error = null
+            }
+
+            if(!credentialsManager.doesPasswordMatchEmail(inputEmail,inputPassword)) {
+                loginErrorPopup.show()
+            }
+            else{
+                startActivity(Intent(this@SignIn,MainActivity::class.java))
+            }
         }
     }
 }
