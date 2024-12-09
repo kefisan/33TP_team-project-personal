@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "app for phone"
 include(":app")
-include(":myapplication")

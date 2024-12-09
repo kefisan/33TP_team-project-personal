@@ -18,7 +18,6 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.textfield.TextInputLayout
 
 
 class SignIn : AppCompatActivity() {
@@ -33,7 +32,7 @@ class SignIn : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_sing_in)
 
-        passwordEditText = findViewById<TextInputLayout>(R.id.password).editText!!
+        passwordEditText = findViewById<TextInputLayout>(R.id.passwordSignIn).editText!!
         usernameEditText = findViewById<TextInputLayout>(R.id.username).editText!!
         credentialsManager = CredentialsManager()
 
