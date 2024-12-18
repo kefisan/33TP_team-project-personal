@@ -15,25 +15,26 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 
-class RegisterNow : AppCompatActivity() {
+class RegisterNow : Fragment(R.layout.activity_register_now) {
 
     private lateinit var mailEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var credentialsManager: CredentialsManager
+    private lateinit var signIn : Fragment
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_register_now)
+    override fun onViewCreated(view:View,savedInstanceState: Bundle?) {
+        super.onViewCreated(view,savedInstanceState)
 
-        passwordEditText = findViewById<TextInputLayout>(R.id.password).editText!!
-        mailEditText = findViewById<TextInputLayout>(R.id.mail).editText!!
-        credentialsManager = CredentialsManager()
+        passwordEditText = view.findViewById<TextInputLayout>(R.id.password).editText!!
+        mailEditText = view.findViewById<TextInputLayout>(R.id.mail).editText!!
+        credentialsManager = CredentialsManager
+        signIn = SignIn()
 
         mailEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -71,39 +72,29 @@ class RegisterNow : AppCompatActivity() {
 //                Toast.makeText(this, getString(R.string.error_invalid_email), Toast.LENGTH_SHORT).show()
 //            }
 
-        val signInLabel = findViewById<TextView>(R.id.register_now)
+        val signInLabel = view.findViewById<TextView>(R.id.register_now)
         signInLabel.setOnClickListener {
             Log.d("Onboarding", "Sign In pressed")
 
-            val goToRegisterIntent = Intent(this, RegisterNow::class.java)
-            startActivity(goToRegisterIntent)
-
+            changeFragment(signIn)
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(view.findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val registerScreenLabel = findViewById<TextView>(R.id.register_now)
-        registerScreenLabel.setOnClickListener {
-            Log.d("Onboarding", "Sign in pressed")
-
-            val goToRegisterIntent = Intent(this, SignIn::class.java)
-            startActivity(goToRegisterIntent)
-        }
-
-        val emailText = findViewById<TextInputEditText>(R.id.mailRegisterText)
-        val emailLayout = findViewById<TextInputLayout>(R.id.mail)
-        val passwordText = findViewById<TextInputEditText>(R.id.passwordRegisterText)
-        val passwordLayout = findViewById<TextInputLayout>(R.id.password)
-        val buttonRegister = findViewById<Button>(R.id.register_button)
+        val emailText = view.findViewById<TextInputEditText>(R.id.mailRegisterText)
+        val emailLayout = view.findViewById<TextInputLayout>(R.id.mail)
+        val passwordText = view.findViewById<TextInputEditText>(R.id.passwordRegisterText)
+        val passwordLayout = view.findViewById<TextInputLayout>(R.id.password)
+        val buttonRegister = view.findViewById<Button>(R.id.register_button)
 
         buttonRegister.setOnClickListener{
             val email = emailText.text.toString()
             val password = passwordText.text.toString()
-            val credentialsManager = CredentialsManager()
+            val credentialsManager = CredentialsManager
 
             if(!credentialsManager.isEmailValid(email)){
                 emailLayout.error = "Email is wrong"
@@ -130,8 +121,20 @@ class RegisterNow : AppCompatActivity() {
             }
 
             credentialsManager.addEmailToMap(email,password)
-            val goToRegisterIntent = Intent(this, SignIn::class.java)
-            startActivity(goToRegisterIntent)
+            changeFragment(signIn)
         }
+
+    }
+    fun changeFragment(fragment: Fragment) {
+        parentFragmentManager.beginTransaction().apply {
+            replace(R.id.flMain, fragment)
+            addToBackStack("Register")
+            commit()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("REGISTER SCREEN","Activity started")
     }
 }
