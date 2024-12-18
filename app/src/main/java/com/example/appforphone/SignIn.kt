@@ -18,13 +18,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
-class SignIn : Fragment(R.layout.activity_sing_in) {
+class SignIn(var credentialsManager: CredentialsManager) : Fragment(R.layout.activity_sing_in) {
 
     private lateinit var usernameEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
     private lateinit var signInLabel: TextView
-    private lateinit var credentialsManager: CredentialsManager
     private lateinit var emailEditText: TextInputEditText
     private lateinit var passwordEditTextField: TextInputEditText
     private lateinit var emailLayout: TextInputLayout
@@ -42,7 +41,6 @@ class SignIn : Fragment(R.layout.activity_sing_in) {
         signInLabel = view.findViewById(R.id.register_now)
         emailEditText = view.findViewById(R.id.usernameText)
         passwordEditTextField = view.findViewById(R.id.passwordText)
-        credentialsManager = CredentialsManager
         passwordLayout = view.findViewById(R.id.passwordSignIn)
         emailLayout = view.findViewById(R.id.username)
         Log.d("Fragments","Initialization before frame layout")
@@ -82,7 +80,7 @@ class SignIn : Fragment(R.layout.activity_sing_in) {
         // Set up the "Register Now" button to switch fragments
         signInLabel.setOnClickListener {
             Log.d("Onboarding", "Register now pressed")
-            val registerFragment = RegisterNow()
+            val registerFragment = RegisterNow(credentialsManager)
             parentFragmentManager.beginTransaction().apply {
                 replace(R.id.flMain, registerFragment)
                 addToBackStack("Sign In")

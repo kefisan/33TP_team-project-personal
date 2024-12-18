@@ -2,7 +2,7 @@ package com.example.appforphone
 
 import java.util.regex.Pattern
 
-object CredentialsManager {
+class CredentialsManager {
 
     private val credentials: MutableMap<String,String> = mutableMapOf(
         //Pair("test@te.st","1234")

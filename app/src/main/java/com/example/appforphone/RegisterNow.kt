@@ -20,11 +20,10 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 
-class RegisterNow : Fragment(R.layout.activity_register_now) {
+class RegisterNow(var credentialsManager: CredentialsManager) : Fragment(R.layout.activity_register_now) {
 
     private lateinit var mailEditText: EditText
     private lateinit var passwordEditText: EditText
-    private lateinit var credentialsManager: CredentialsManager
     private lateinit var signIn : Fragment
 
 
@@ -33,8 +32,7 @@ class RegisterNow : Fragment(R.layout.activity_register_now) {
 
         passwordEditText = view.findViewById<TextInputLayout>(R.id.password).editText!!
         mailEditText = view.findViewById<TextInputLayout>(R.id.mail).editText!!
-        credentialsManager = CredentialsManager
-        signIn = SignIn()
+        signIn = SignIn(credentialsManager)
 
         mailEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -94,7 +92,6 @@ class RegisterNow : Fragment(R.layout.activity_register_now) {
         buttonRegister.setOnClickListener{
             val email = emailText.text.toString()
             val password = passwordText.text.toString()
-            val credentialsManager = CredentialsManager
 
             if(!credentialsManager.isEmailValid(email)){
                 emailLayout.error = "Email is wrong"
