@@ -46,4 +46,16 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+
+    <string-array name="Birds">
+        <item>Black Rosy Finch</item>
+        <item>Baltimore oriole</item>
+        <item>Bald Eagle</item>
+    </string-array>
+
+    <string-array name="Descriptions">
+        <item>black on the head, back and breast with pink on the belly, rump and wings</item>
+        <item>orange on the underparts, shoulder patch, and rump, with some birds appearing a very deep flaming orange</item>
+        <item>The plumage of an adult bald eagle is evenly dark brown with a white head and tail.</item>
+    </string-array>
 </resources>

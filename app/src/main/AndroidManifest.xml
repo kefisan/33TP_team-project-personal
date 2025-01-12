@@ -13,16 +13,18 @@
         android:theme="@style/Theme.AppForPhone"
         tools:targetApi="31">
         <activity
+            android:name=".ListActivity"
+            android:exported="false" />
+        <activity
             android:name=".AuthorizationActivity"
             android:exported="true"
             android:theme="@style/Theme.AppForPhone">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-
         <activity
             android:name=".FragmentTest"
             android:exported="true" />

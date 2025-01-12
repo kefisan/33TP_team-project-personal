@@ -112,7 +112,7 @@ class SignIn(var credentialsManager: CredentialsManager) : Fragment(R.layout.act
             if (!credentialsManager.doesPasswordMatchEmail(inputEmail, inputPassword)) {
                 loginErrorPopup.show()
             } else {
-                var gotoWelcomeScreen =Intent(getActivity(),FragmentTest()::class.java)
+                var gotoWelcomeScreen =Intent(getActivity(),ListActivity::class.java)
                 startActivity(gotoWelcomeScreen)
             }
         }
