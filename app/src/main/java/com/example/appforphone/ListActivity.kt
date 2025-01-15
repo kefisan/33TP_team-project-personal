@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -20,9 +21,13 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ListActivity : AppCompatActivity() {
 
-    lateinit var titlesList: Array<String>
-    lateinit var descriptionsList: Array<String>
-    lateinit var imagesList: Array<Int>
+    lateinit var titlesList: List<String>
+    lateinit var descriptionsList: List<String>
+    lateinit var imagesList: List<Int>
+
+    lateinit var filteredTitlesList: List<String>
+    lateinit var filteredDescriptionsList: List<String>
+    lateinit var filteredImagesList: List<Int>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,22 +39,61 @@ class ListActivity : AppCompatActivity() {
             insets
         }
 
-        titlesList = resources.getStringArray(R.array.Birds)
-        descriptionsList = resources.getStringArray(R.array.Descriptions)
-        imagesList = arrayOf(R.drawable.black_rosy_finch,R.drawable.baltimore_oriole,R.drawable.bald_eagle)
+        titlesList = resources.getStringArray(R.array.Birds).toList()
+        descriptionsList = resources.getStringArray(R.array.Descriptions).toList()
+        imagesList = listOf(R.drawable.black_rosy_finch,R.drawable.baltimore_oriole,R.drawable.bald_eagle)
         var recyclerView = findViewById<RecyclerView>(R.id.recyclerViewList)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = RVAdapter(titlesList, descriptionsList,imagesList)
+        val adapter = recyclerView.adapter
 
+        val viewModel = ViewModelSearch()
+        val searchBar = findViewById<SearchView>(R.id.searchBar)
+        viewModel.setData(titlesList,descriptionsList,imagesList)
+
+        searchBar.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if(query!=null){
+                    viewModel.search(query)
+                    (recyclerView.adapter as RVAdapter).updateData(
+                        viewModel.filteredTitlesList,
+                        viewModel.filteredDescriptionsList,
+                        viewModel.filteredImagesList
+                    )
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null && newText.length > 2) {
+                    viewModel.search(newText)
+
+                    (recyclerView.adapter as RVAdapter).updateData(
+                        viewModel.filteredTitlesList,
+                        viewModel.filteredDescriptionsList,
+                        viewModel.filteredImagesList
+                    )
+                }
+                else{
+                    (recyclerView.adapter as RVAdapter).updateData(
+                        titlesList,
+                        descriptionsList,
+                        imagesList
+                    )
+                }
+                return true
+            }
+
+        })
     }
 
 }
 
 class RVAdapter(
-    private var titles:Array<String>,
-    private var descriptions:Array<String>,
-    private var images:Array<Int>): RecyclerView.Adapter<RVAdapter.ViewHolder>() {
+    private var titles:List<String>,
+    private var descriptions:List<String>,
+    private var images:List<Int>): RecyclerView.Adapter<RVAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -93,5 +137,11 @@ class RVAdapter(
         holder.itemDesc.text = descriptions[position]
         holder.itemImg.setImageResource(images[position])
         }
+    public fun updateData(_titles:List<String>,_desc:List<String>,_images:List<Int>){
+        titles=_titles
+        descriptions=_desc
+        images = _images
+        notifyDataSetChanged()
+    }
     }
 
