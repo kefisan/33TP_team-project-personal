@@ -34,7 +34,6 @@ class SignIn(var credentialsManager: CredentialsManager) : Fragment(R.layout.act
         super.onViewCreated(view, savedInstanceState)
         Log.d("FRAGMENTS", "Initializing values")
 
-        // Initialize views
         usernameEditText = view.findViewById<TextInputLayout>(R.id.username).editText!!
         passwordEditText = view.findViewById<TextInputLayout>(R.id.passwordSignIn).editText!!
         loginButton = view.findViewById(R.id.login_button)
@@ -43,10 +42,9 @@ class SignIn(var credentialsManager: CredentialsManager) : Fragment(R.layout.act
         passwordEditTextField = view.findViewById(R.id.passwordText)
         passwordLayout = view.findViewById(R.id.passwordSignIn)
         emailLayout = view.findViewById(R.id.username)
-        Log.d("Fragments","Initialization before frame layout")
+        Log.d("Fragments", "Initialization before frame layout")
         mainL = view.findViewById(R.id.main)
 
-        // Set window insets for edge-to-edge display
         ViewCompat.setOnApplyWindowInsetsListener(mainL) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -55,29 +53,34 @@ class SignIn(var credentialsManager: CredentialsManager) : Fragment(R.layout.act
 
         Log.d("FRAGMENTS", "Finished initializing values")
 
-        // Add text watcher for email and password validation
         usernameEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 val email = emailEditText.text.toString()
-                val password = passwordEditTextField.text.toString()
-                val isValid = credentialsManager.isEmailValid(email) && credentialsManager.isPasswordValid(password)
-                if (isValid) {
-                    usernameEditText.error = null
-                    passwordEditTextField.error = null
-                } else {
+                if (!credentialsManager.isEmailValid(email)) {
                     usernameEditText.error = getString(R.string.error_invalid_email)
-                    passwordEditTextField.error = getString(R.string.error_invalid_password)
+                    Log.d("Validation", "Invalid email: $email")
+                } else {
+                    usernameEditText.error = null
                 }
             }
         })
 
-        // Set up the "Register Now" button to switch fragments
+        passwordEditTextField.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val password = passwordEditTextField.text.toString()
+                if (!credentialsManager.isPasswordValid(password)) {
+                    passwordEditTextField.error = getString(R.string.error_invalid_password)
+                    Log.d("Validation", "Invalid password")
+                } else {
+                    passwordEditTextField.error = null
+                }
+            }
+        })
+
         signInLabel.setOnClickListener {
             Log.d("Onboarding", "Register now pressed")
             val registerFragment = RegisterNow(credentialsManager)
@@ -95,30 +98,33 @@ class SignIn(var credentialsManager: CredentialsManager) : Fragment(R.layout.act
             val inputPassword = passwordEditText.text.toString()
             val inputEmail = emailEditText.text.toString()
 
+            var isValid = true
+
             if (!credentialsManager.isPasswordValid(inputPassword)) {
                 passwordLayout.error = "Invalid Password"
-                return@setOnClickListener
+                isValid = false
             } else {
                 passwordLayout.error = null
             }
 
             if (!credentialsManager.isEmailValid(inputEmail)) {
                 emailLayout.error = "Invalid Email"
-                return@setOnClickListener
+                isValid = false
             } else {
                 emailLayout.error = null
             }
 
-            if (!credentialsManager.doesPasswordMatchEmail(inputEmail, inputPassword)) {
+            if (isValid && !credentialsManager.doesPasswordMatchEmail(inputEmail, inputPassword)) {
                 loginErrorPopup.show()
-            } else {
-                var gotoWelcomeScreen =Intent(getActivity(),ListActivity::class.java)
+            } else if (isValid) {
+                var gotoWelcomeScreen = Intent(getActivity(), ListActivity::class.java)
                 startActivity(gotoWelcomeScreen)
             }
         }
         super.onStart()
         Log.d("SignInFragment", "onStart called")
     }
+
     fun changeFragment(fragment: Fragment) {
         parentFragmentManager.beginTransaction().apply {
             replace(R.id.flMain, fragment)

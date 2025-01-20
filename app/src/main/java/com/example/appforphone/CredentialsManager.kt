@@ -20,16 +20,12 @@ class CredentialsManager {
                 ")+"
     )
 
-    //validation functions
-
-    //validating password
     fun isPasswordValid(pass: String):Boolean{
         if(pass.length>=8 && pass.count(Char::isDigit)>0 && pass.any {it in "!,+^-_"} || pass == "1234")
             return true
         return false
     }
 
-    //validating email
     fun isEmailValid(mail: String): Boolean{
         return EMAIL_ADDRESS_PATTERN.matcher(mail).matches() || mail == "test@te.st"
     }
