@@ -1,37 +1,28 @@
 package com.example.appforphone
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class ViewModelSearch: ViewModel() {
 
-    lateinit var titlesList: List<String>
-    lateinit var descriptionsList: List<String>
-    lateinit var imagesList: List<Int>
+    lateinit var birdList: List<Bird>
 
-    lateinit var filteredTitlesList: List<String>
-    lateinit var filteredDescriptionsList: List<String>
-    lateinit var filteredImagesList: List<Int>
-    lateinit var filteredIndices: List<Int>
+    lateinit var filteredBird: List<Bird>
 
-    fun setData(titles: List<String>,descriptions: List<String>, images: List<Int>){
-        titlesList = titles.toList()
-        descriptionsList = descriptions.toList()
-        imagesList= images.toList()
+    fun setData(birds: List<Bird>){
+        birdList = birds
     }
 
     fun search(input: String){
         if(input.length<3){
-            filteredTitlesList = titlesList
-            filteredDescriptionsList = descriptionsList
-            filteredImagesList = imagesList
+            filteredBird=birdList
         }
         else{
-            filteredIndices = titlesList.indices.filter{index->
-                titlesList[index].contains(input,ignoreCase = true) ||
-                        descriptionsList[index].contains(input,ignoreCase = true)}
+            filteredBird = birdList.filter{bird->
+                bird.title.contains(input,ignoreCase = true) ||
+                        bird.desc.contains(input,ignoreCase = true)}
         }
-        filteredTitlesList = filteredIndices.map{titlesList[it]}
-        filteredDescriptionsList = filteredIndices.map{descriptionsList[it]}
-        filteredImagesList = filteredIndices.map{imagesList[it]}
     }
 }

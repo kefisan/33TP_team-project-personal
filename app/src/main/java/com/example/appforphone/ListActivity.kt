@@ -17,17 +17,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 
 
 class ListActivity : AppCompatActivity() {
 
-    lateinit var titlesList: List<String>
-    lateinit var descriptionsList: List<String>
-    lateinit var imagesList: List<Int>
-
-    lateinit var filteredTitlesList: List<String>
-    lateinit var filteredDescriptionsList: List<String>
-    lateinit var filteredImagesList: List<Int>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,27 +34,31 @@ class ListActivity : AppCompatActivity() {
             insets
         }
 
-        titlesList = resources.getStringArray(R.array.Birds).toList()
-        descriptionsList = resources.getStringArray(R.array.Descriptions).toList()
-        imagesList = listOf(R.drawable.black_rosy_finch,R.drawable.baltimore_oriole,R.drawable.bald_eagle)
+        val titlesList = resources.getStringArray(R.array.Birds).toList()
+        val descriptionsList = resources.getStringArray(R.array.Descriptions).toList()
+        val imagesList = listOf(R.drawable.black_rosy_finch,R.drawable.baltimore_oriole,R.drawable.bald_eagle)
+
+        val birdsList = mutableListOf<Bird>()
+
+        for(i in titlesList.indices){
+            birdsList.add(Bird(titlesList[i],descriptionsList[i],imagesList[i]))
+        }
         var recyclerView = findViewById<RecyclerView>(R.id.recyclerViewList)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = RVAdapter(titlesList, descriptionsList,imagesList)
+        recyclerView.adapter = RVAdapter(birdsList)
         val adapter = recyclerView.adapter
 
         val viewModel = ViewModelSearch()
         val searchBar = findViewById<SearchView>(R.id.searchBar)
-        viewModel.setData(titlesList,descriptionsList,imagesList)
+        viewModel.setData(birdsList)
 
         searchBar.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if(query!=null){
                     viewModel.search(query)
                     (recyclerView.adapter as RVAdapter).updateData(
-                        viewModel.filteredTitlesList,
-                        viewModel.filteredDescriptionsList,
-                        viewModel.filteredImagesList
+                        viewModel.filteredBird
                     )
                 }
                 return true
@@ -70,16 +69,12 @@ class ListActivity : AppCompatActivity() {
                     viewModel.search(newText)
 
                     (recyclerView.adapter as RVAdapter).updateData(
-                        viewModel.filteredTitlesList,
-                        viewModel.filteredDescriptionsList,
-                        viewModel.filteredImagesList
+                        viewModel.filteredBird
                     )
                 }
                 else{
                     (recyclerView.adapter as RVAdapter).updateData(
-                        titlesList,
-                        descriptionsList,
-                        imagesList
+                        birdsList
                     )
                 }
                 return true
@@ -91,9 +86,7 @@ class ListActivity : AppCompatActivity() {
 }
 
 class RVAdapter(
-    private var titles:List<String>,
-    private var descriptions:List<String>,
-    private var images:List<Int>): RecyclerView.Adapter<RVAdapter.ViewHolder>() {
+    private var birds:List<Bird>): RecyclerView.Adapter<RVAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -128,19 +121,17 @@ class RVAdapter(
     }
 
     override fun getItemCount(): Int {
-        return titles.size
+        return birds.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Log.d("RVAdapter", "Binding item at position: $position")
-        holder.itemTitle.text = titles[position]
-        holder.itemDesc.text = descriptions[position]
-        holder.itemImg.setImageResource(images[position])
+        holder.itemTitle.text = birds[position].title
+        holder.itemDesc.text = birds[position].desc
+        holder.itemImg.setImageResource(birds[position].img)
         }
-    public fun updateData(_titles:List<String>,_desc:List<String>,_images:List<Int>){
-        titles=_titles
-        descriptions=_desc
-        images = _images
+    public fun updateData(birdsNew:List<Bird>){
+        birds=birdsNew
         notifyDataSetChanged()
     }
     }
