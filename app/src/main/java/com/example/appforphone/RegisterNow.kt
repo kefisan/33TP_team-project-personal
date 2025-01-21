@@ -35,40 +35,33 @@ class RegisterNow(var credentialsManager: CredentialsManager) : Fragment(R.layou
         signIn = SignIn(credentialsManager)
 
         mailEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-
-            // some fix here
-
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                val password = s.toString()
-                val email = s.toString()
-                val isValid = credentialsManager.isEmailValid(email) && credentialsManager.isPasswordValid(password)
-                if (isValid) {
-                    mailEditText.error = null
-                    passwordEditText.error = null
-                } else {
+                val email = mailEditText.text.toString()
+                if (!credentialsManager.isEmailValid(email)) {
                     mailEditText.error = getString(R.string.error_invalid_email)
-                    passwordEditText.error = getString(R.string.error_invalid_password)
+                    Log.d("Validation", "Invalid email: $email")
+                } else {
+                    mailEditText.error = null
                 }
             }
         })
 
-//        val registerScreenLabel = findViewById<TextView>(R.id.register_now)
-//        registerScreenLabel.setOnClickListener {
-//            Log.d("Onboarding", "Sign in pressed")
-//
-//            val email = mailEditText.text.toString().trim()
-//            val isValidEmail = credentialsManager.isEmailValid(email)
-//            if (isValidEmail) {
-//                val goToRegisterIntent = Intent(this, SignIn::class.java)
-//                startActivity(goToRegisterIntent)
-//            } else {
-//                Toast.makeText(this, getString(R.string.error_invalid_email), Toast.LENGTH_SHORT).show()
-//            }
+        passwordEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val password = passwordEditText.text.toString()
+                if (!credentialsManager.isPasswordValid(password)) {
+                    passwordEditText.error = getString(R.string.error_invalid_password)
+                    Log.d("Validation", "Invalid password")
+                } else {
+                    passwordEditText.error = null
+                }
+            }
+        })
+
 
         val signInLabel = view.findViewById<TextView>(R.id.register_now)
         signInLabel.setOnClickListener {
