@@ -15,10 +15,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.launch
 
 
 class ListActivity : AppCompatActivity() {
@@ -46,20 +48,23 @@ class ListActivity : AppCompatActivity() {
         var recyclerView = findViewById<RecyclerView>(R.id.recyclerViewList)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = RVAdapter(birdsList)
-        val adapter = recyclerView.adapter
+        val adapter = RVAdapter(emptyList())
+        recyclerView.adapter = adapter
 
         val viewModel = ViewModelSearch()
         val searchBar = findViewById<SearchView>(R.id.searchBar)
         viewModel.setData(birdsList)
 
+        lifecycleScope.launch {
+            viewModel.filteredBirds.collect{ filteredBirds ->
+                adapter.updateData(filteredBirds)
+            }
+        }
+
         searchBar.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if(query!=null){
                     viewModel.search(query)
-                    (recyclerView.adapter as RVAdapter).updateData(
-                        viewModel.filteredBird
-                    )
                 }
                 return true
             }
@@ -67,15 +72,9 @@ class ListActivity : AppCompatActivity() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText != null && newText.length > 2) {
                     viewModel.search(newText)
-
-                    (recyclerView.adapter as RVAdapter).updateData(
-                        viewModel.filteredBird
-                    )
                 }
                 else{
-                    (recyclerView.adapter as RVAdapter).updateData(
-                        birdsList
-                    )
+                    viewModel.search("")
                 }
                 return true
             }
@@ -104,7 +103,7 @@ class RVAdapter(
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            itemButton.setOnClickListener{
+            itemButton.setOnClickListener {
                 val position: Int = adapterPosition
                 Toast.makeText(
                     itemView.context,
@@ -126,13 +125,18 @@ class RVAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Log.d("RVAdapter", "Binding item at position: $position")
-        holder.itemTitle.text = birds[position].title
-        holder.itemDesc.text = birds[position].desc
-        holder.itemImg.setImageResource(birds[position].img)
-        }
-    public fun updateData(birdsNew:List<Bird>){
-        birds=birdsNew
+
+        val bird = birds[position]
+
+        holder.itemTitle.text = bird.title
+        holder.itemDesc.text = bird.desc
+        holder.itemImg.setImageResource(bird.img)
+    }
+
+    public fun updateData(birdsNew: List<Bird>) {
+        if (birdsNew != birds)
+            birds = birdsNew
         notifyDataSetChanged()
     }
-    }
+}
 
