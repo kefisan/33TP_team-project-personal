@@ -8,21 +8,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.launch
 
 
 class ListActivity : AppCompatActivity() {
 
-    lateinit var titlesList: Array<String>
-    lateinit var descriptionsList: Array<String>
-    lateinit var imagesList: Array<Int>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,22 +36,56 @@ class ListActivity : AppCompatActivity() {
             insets
         }
 
-        titlesList = resources.getStringArray(R.array.Birds)
-        descriptionsList = resources.getStringArray(R.array.Descriptions)
-        imagesList = arrayOf(R.drawable.black_rosy_finch,R.drawable.baltimore_oriole,R.drawable.bald_eagle)
+        val titlesList = resources.getStringArray(R.array.Birds).toList()
+        val descriptionsList = resources.getStringArray(R.array.Descriptions).toList()
+        val imagesList = listOf(R.drawable.black_rosy_finch,R.drawable.baltimore_oriole,R.drawable.bald_eagle)
+
+        val birdsList = mutableListOf<Bird>()
+
+        for(i in titlesList.indices){
+            birdsList.add(Bird(titlesList[i],descriptionsList[i],imagesList[i]))
+        }
         var recyclerView = findViewById<RecyclerView>(R.id.recyclerViewList)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = RVAdapter(titlesList, descriptionsList,imagesList)
+        val adapter = RVAdapter(emptyList())
+        recyclerView.adapter = adapter
 
+        val viewModel = ViewModelSearch()
+        val searchBar = findViewById<SearchView>(R.id.searchBar)
+        viewModel.setData(birdsList)
+
+        lifecycleScope.launch {
+            viewModel.filteredBirds.collect{ filteredBirds ->
+                adapter.updateData(filteredBirds)
+            }
+        }
+
+        searchBar.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if(query!=null){
+                    viewModel.search(query)
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null && newText.length > 2) {
+                    viewModel.search(newText)
+                }
+                else{
+                    viewModel.search("")
+                }
+                return true
+            }
+
+        })
     }
 
 }
 
 class RVAdapter(
-    private var titles:Array<String>,
-    private var descriptions:Array<String>,
-    private var images:Array<Int>): RecyclerView.Adapter<RVAdapter.ViewHolder>() {
+    private var birds:List<Bird>): RecyclerView.Adapter<RVAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -67,7 +103,7 @@ class RVAdapter(
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            itemButton.setOnClickListener{
+            itemButton.setOnClickListener {
                 val position: Int = adapterPosition
                 Toast.makeText(
                     itemView.context,
@@ -84,14 +120,23 @@ class RVAdapter(
     }
 
     override fun getItemCount(): Int {
-        return titles.size
+        return birds.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Log.d("RVAdapter", "Binding item at position: $position")
-        holder.itemTitle.text = titles[position]
-        holder.itemDesc.text = descriptions[position]
-        holder.itemImg.setImageResource(images[position])
-        }
+
+        val bird = birds[position]
+
+        holder.itemTitle.text = bird.title
+        holder.itemDesc.text = bird.desc
+        holder.itemImg.setImageResource(bird.img)
     }
+
+    public fun updateData(birdsNew: List<Bird>) {
+        if (birdsNew != birds)
+            birds = birdsNew
+        notifyDataSetChanged()
+    }
+}
 

@@ -7,8 +7,9 @@
     android:layout_height="match_parent"
     tools:context=".AuthorizationActivity">
 
+
     <FrameLayout
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/flMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

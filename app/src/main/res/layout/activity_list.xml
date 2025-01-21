@@ -7,13 +7,23 @@
     android:layout_height="match_parent"
     tools:context=".ListActivity">
 
+    <SearchView
+        android:id="@+id/searchBar"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:queryHint="Enter item name or description" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewList"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="80dp"
         android:layout_width="match_parent"
-        android:layout_height="800dp"
-        tools:itemCount="5"/>
+        android:layout_height="700dp"
+        tools:itemCount="10"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
